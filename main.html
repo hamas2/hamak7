@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FLEX TV - الصفحة الرئيسية</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header>
+            <div class="app-header">
+                <button class="menu-btn" id="menu-btn"><i class="fas fa-bars"></i></button>
+                <h1 class="app-title">Flex | TV</h1>
+                <button class="search-btn" id="main-search-btn"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="notification-bar">
+                <p>لا تجعل المباريات تلهيك عن ذكر الله</p>
+                <button class="close-notification"><i class="fas fa-times"></i></button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <div class="section-header">
+                <button class="all-channels-btn" id="all-channels-btn">
+                    <i class="fas fa-th"></i>
+                    <span>جميع القنوات</span>
+                </button>
+                <h2>الأقسام الرئيسية</h2>
+                <div style="width: 36px;"></div>
+            </div>
+
+            <!-- Categories -->
+            <div class="categories" id="categories-container">
+                <!-- Categories will be dynamically added here -->
+            </div>
+        </main>
+
+        <!-- Side Menu -->
+        <div class="side-menu" id="side-menu">
+            <div class="side-menu-header">
+                <h3>القائمة</h3>
+                <button class="close-menu-btn" id="close-menu-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="side-menu-content">
+                <a href="favorites.html" class="menu-item">
+                    <i class="fas fa-heart"></i>
+                    <span>المفضلة</span>
+                </a>
+                <a href="highlights.html" class="menu-item">
+                    <i class="fas fa-video"></i>
+                    <span>اهداف و ملخصات</span>
+                </a>
+                <a href="settings.html" class="menu-item" id="settings-link">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+                <a href="about.html" class="menu-item" id="about-link">
+                    <i class="fas fa-info-circle"></i>
+                    <span>حول التطبيق</span>
+                </a>
+                <a href="#" class="menu-item" id="logout-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>تسجيل الخروج</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Search Container -->
+        <div class="search-container" id="search-container">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="البحث في القنوات...">
+                <button class="search-close-btn" id="search-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="search-results" id="search-results"></div>
+        </div>
+
+        <div class="overlay" id="overlay"></div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

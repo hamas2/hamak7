@@ -1,0 +1,3606 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FLEX TV</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        :root {
+            --bg-color: #000;
+            --text-color: #fff;
+            --card-bg: #1a1a1a;
+            --header-bg: #000;
+            --accent-color: #2196f3;
+            --accent-gradient: linear-gradient(135deg, #2196f3, #e91e63);
+            --secondary-bg: #222;
+            --notification-bg: #333;
+            --loader-color: #2196f3;
+            --favorite-color: #ff4081;
+            --favorite-active-color: #ff0055;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            --transition-speed: 0.3s;
+            --purple-color: #e91e63;
+            --blue-color: #2196f3;
+        }
+
+        .light-mode {
+            --bg-color: #f5f5f5;
+            --text-color: #121212;
+            --card-bg: #ffffff;
+            --header-bg: #ffffff;
+            --secondary-bg: #e0e0e0;
+            --notification-bg: #d1d1d1;
+            --loader-color: #2196f3;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body, html {
+            font-family: "Cairo", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100%;
+            width: 100%;
+            overflow-x: hidden;
+            direction: rtl;
+            transition: background-color 0.3s ease;
+        }
+
+        #app {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            background-color: var(--bg-color);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-gradient);
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .login-circles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .login-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            opacity: 0.1;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .login-circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .login-circle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            right: -100px;
+            animation-delay: 2s;
+        }
+
+        .login-circle:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            bottom: -75px;
+            left: 30%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        .logo {
+            font-size: 40px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            color: var(--text-color);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 320px;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 20px;
+            color: var(--text-color);
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 25px;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            font-size: 18px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-form input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        }
+
+        .login-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .login-form button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(33, 150, 243, 0.4);
+        }
+
+        /* App Header */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--secondary-bg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: bold;
+            flex-grow: 1;
+            text-align: center;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .menu-btn, .refresh-btn, .favorite-btn, .back-btn, .search-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            padding: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+
+        .menu-btn:active, .refresh-btn:active, .favorite-btn:active, .back-btn:active, .search-btn:active {
+            transform: scale(0.9);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--header-bg);
+            padding: 10px;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-container.active {
+            transform: translateY(0);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: var(--secondary-bg);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: none;
+            background-color: transparent;
+            color: var(--text-color);
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+        }
+
+        .search-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 16px;
+            padding: 0 15px;
+            cursor: pointer;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-results {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 99;
+            max-height: 60vh;
+            overflow-y: auto;
+            display: none;
+            padding: 10px;
+            margin: 0 10px;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--secondary-bg);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background-color: var(--secondary-bg);
+        }
+
+        .search-result-logo {
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .search-result-name {
+            font-size: 14px;
+        }
+
+        .search-no-results {
+            padding: 15px;
+            text-align: center;
+            color: #888;
+        }
+
+        /* Notification Bar */
+        .notification-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: var(--accent-gradient);
+            margin: 10px;
+            border-radius: 20px;
+            animation: slideIn 0.5s ease;
+            color: white;
+        }
+
+        .close-notification {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+        }
+
+        .section-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .all-channels-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .all-channels-btn:hover {
+            background-color: var(--secondary-bg);
+        }
+
+        /* Categories */
+        .categories {
+            padding: 0 10px 20px 10px;
+        }
+
+        .category-item {
+            margin-bottom: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: var(--card-bg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease;
+            animation-fill-mode: both;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-item:active {
+            transform: scale(0.98);
+        }
+
+        .category-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .category-item:active::after {
+            opacity: 1;
+        }
+
+        .category-content {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+        }
+
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: contain;
+            margin-left: 12px;
+        }
+
+        .category-content span {
+            flex-grow: 1;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .category-content i {
+            font-size: 16px;
+            opacity: 0.7;
+            transition: transform 0.3s ease;
+        }
+
+        .category-item:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .category-item:hover .category-content {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .category-item:hover .category-content i {
+            transform: translateX(-5px);
+            opacity: 1;
+        }
+
+        /* Channel Grid Page */
+        .channel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--secondary-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .channel-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Channels Wrap - New Improved Layout */
+        .channels-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 15px;
+            padding-bottom: 20px;
+            justify-content: center;
+        }
+
+        .channel-card {
+            width: calc(33.333% - 8px);
+            max-width: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 12px 8px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: var(--card-shadow);
+        }
+
+        @media (min-width: 400px) {
+            .channel-card {
+                width: calc(25% - 9px);
+            }
+        }
+
+        @media (min-width: 600px) {
+            .channel-card {
+                width: calc(20% - 10px);
+            }
+        }
+
+        .channel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(233, 30, 99, 0.1));
+        }
+
+        .channel-card:active {
+            transform: scale(0.95);
+        }
+
+        .channel-logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 8px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .channel-card:hover .channel-logo {
+            transform: scale(1.05);
+        }
+
+        .channel-name {
+            font-size: 12px;
+            text-align: center;
+            color: var(--text-color);
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .favorite-toggle {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: var(--favorite-color);
+            font-size: 14px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+
+        .favorite-toggle:active {
+            transform: scale(0.9);
+        }
+
+        .favorite-toggle.active {
+            color: var(--favorite-active-color);
+        }
+
+        /* Highlights Page */
+        .highlights-container {
+            padding: 15px;
+            padding-bottom: 20px;
+        }
+
+        .highlight-item {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease;
+            animation-fill-mode: both;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .highlight-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .highlight-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .highlight-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .highlight-info {
+            padding: 15px;
+        }
+
+        .highlight-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .highlight-desc {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        /* Favorites Page */
+        .favorites-container {
+            padding: 15px;
+            padding-bottom: 70px;
+        }
+
+        .no-favorites {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+
+        /* Video Player Page */
+        .video-player-page {
+            padding-bottom: 20px;
+        }
+
+        .video-container {
+            width: 100%;
+            background-color: #000;
+            position: relative;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-info {
+            padding: 15px;
+            background-color: var(--card-bg);
+            margin-bottom: 15px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .video-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .video-desc {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .related-videos {
+            padding: 0 15px;
+        }
+
+        .related-videos h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .related-video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .related-video-item {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
+        }
+
+        .related-video-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .related-video-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .related-video-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .related-video-info {
+            padding: 10px;
+        }
+
+        .related-video-title {
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        }
+
+        .side-menu.open {
+            right: 0;
+        }
+
+        .side-menu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 15px;
+            border-bottom: 1px solid var(--secondary-bg);
+            background: var(--accent-gradient);
+        }
+
+        .side-menu-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .close-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .close-menu:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .side-menu-content {
+            padding: 15px;
+        }
+
+        .menu-section {
+            margin-bottom: 25px;
+        }
+
+        .menu-section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--secondary-bg);
+            color: var(--accent-color);
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 10px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(233, 30, 99, 0.1));
+            transform: translateX(-5px);
+        }
+
+        .menu-item:active {
+            opacity: 0.7;
+        }
+
+        .menu-item i {
+            width: 30px;
+            font-size: 18px;
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover i {
+            transform: scale(1.2);
+            color: var(--accent-color);
+        }
+
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-switch:hover {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(233, 30, 99, 0.1));
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: var(--accent-gradient);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            font-size: 20px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .social-link.instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+
+        .social-link.tiktok {
+            background: linear-gradient(45deg, #000000 0%, #25F4EE 50%, #FE2C55 100%);
+        }
+
+        .social-link.telegram {
+            background-color: #0088cc;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(3px);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Settings Page */
+        .settings-page {
+            padding: 15px;
+            padding-bottom: 20px;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .settings-section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--secondary-bg);
+            color: var(--accent-color);
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--secondary-bg);
+            cursor: pointer;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item-title {
+            font-size: 14px;
+        }
+
+        /* About Page */
+        .about-page {
+            padding: 15px;
+            padding-bottom: 20px;
+        }
+
+
+        .about-logo {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .about-logo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .about-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .about-version {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .about-description {
+            margin-bottom: 30px;
+            line-height: 1.6;
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .about-section {
+            margin-bottom: 25px;
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .about-section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--secondary-bg);
+            color: var(--accent-color);
+        }
+
+        .about-section-content {
+            line-height: 1.6;
+        }
+
+        .about-contact {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .about-contact i {
+            width: 30px;
+            font-size: 18px;
+        }
+
+        .share-app-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--accent-gradient);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            width: 100%;
+        }
+
+        .share-app-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .share-app-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Improved Loader */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .loader-container.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .flex-loader {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+        }
+
+        .flex-loader-circle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 4px solid transparent;
+            border-radius: 50%;
+        }
+
+        .flex-loader-circle:nth-child(1) {
+            border-top-color: var(--blue-color);
+            animation: spin 1.5s linear infinite;
+        }
+
+        .flex-loader-circle:nth-child(2) {
+            border-bottom-color: var(--purple-color);
+            animation: spin 2s linear infinite reverse;
+        }
+
+        .loader-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            animation: pulse 2s infinite;
+            border-radius: 50%;
+        }
+
+        .loader-text {
+            font-size: 16px;
+            color: var(--text-color);
+            margin-top: 10px;
+            opacity: 0;
+            animation: fadeInOut 2s infinite 0.5s;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(0.9); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .toast {
+            background: var(--accent-gradient);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            text-align: center;
+            animation: fadeInUp 0.3s ease, fadeOut 0.3s ease 2.7s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Apply animation delay to category items */
+        .category-item:nth-child(1) { animation-delay: 0.1s; }
+        .category-item:nth-child(2) { animation-delay: 0.2s; }
+        .category-item:nth-child(3) { animation-delay: 0.3s; }
+        .category-item:nth-child(4) { animation-delay: 0.4s; }
+        .category-item:nth-child(5) { animation-delay: 0.5s; }
+        .category-item:nth-child(6) { animation-delay: 0.6s; }
+        .category-item:nth-child(7) { animation-delay: 0.7s; }
+        .category-item:nth-child(8) { animation-delay: 0.8s; }
+        .category-item:nth-child(9) { animation-delay: 0.9s; }
+
+        /* Content padding */
+        main {
+            padding-bottom: 20px;
+        }
+
+        /* Video.js Custom Styles */
+        .video-js {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+        }
+
+        .video-js .vjs-big-play-button {
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 50%;
+            width: 2em;
+            height: 2em;
+            line-height: 2em;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .video-js .vjs-control-bar {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .video-js .vjs-play-progress {
+            background: var(--accent-gradient);
+        }
+
+        .video-js .vjs-volume-level {
+            background-color: var(--accent-color);
+        }
+
+        .video-js .vjs-slider {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .video-js:hover .vjs-big-play-button {
+            background: var(--accent-gradient);
+            transform: translate(-50%, -50%) scale(1.1);
+            transition: all 0.3s ease;
+        }
+
+        /* PIN Lock Modal */
+        .pin-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .pin-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .pin-container {
+            width: 90%;
+            max-width: 320px;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .pin-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .pin-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .pin-digit {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: var(--secondary-bg);
+            border: none;
+            font-size: 18px;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        .pin-digit:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .pin-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .pin-button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pin-cancel {
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+        }
+
+        .pin-submit {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .pin-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .pin-button:active {
+            transform: translateY(1px);
+        }
+
+        /* Forgot PIN link */
+        .forgot-pin {
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--accent-color);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .forgot-pin:hover {
+            color: var(--purple-color);
+        }
+
+        /* Set PIN Modal */
+        .set-pin-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .set-pin-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .set-pin-container {
+            width: 90%;
+            max-width: 320px;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .set-pin-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .set-pin-input {
+            margin-bottom: 20px;
+        }
+
+        .set-pin-input input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: var(--secondary-bg);
+            border: none;
+            font-size: 16px;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        .set-pin-input input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .set-pin-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .set-pin-button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .set-pin-cancel {
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+        }
+
+        .set-pin-save {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .set-pin-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .set-pin-button:active {
+            transform: translateY(1px);
+        }
+
+        /* Change PIN Modal */
+        .change-pin-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .change-pin-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .change-pin-container {
+            width: 90%;
+            max-width: 320px;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .change-pin-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .change-pin-input {
+            margin-bottom: 20px;
+        }
+
+        .change-pin-input input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: var(--secondary-bg);
+            border: none;
+            font-size: 16px;
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .change-pin-input input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .change-pin-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .change-pin-button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .change-pin-cancel {
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+        }
+
+        .change-pin-save {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .change-pin-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .change-pin-button:active {
+            transform: translateY(1px);
+        }
+
+        /* CAPTCHA Modal */
+        .captcha-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .captcha-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .captcha-container {
+            width: 90%;
+            max-width: 320px;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .captcha-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .captcha-image {
+            width: 100%;
+            height: 80px;
+            background-color: var(--secondary-bg);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 5px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .captcha-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 49%, rgba(255, 255, 255, 0.05) 50%, transparent 51%);
+            background-size: 10px 10px;
+        }
+
+        .captcha-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, transparent 49%, rgba(255, 255, 255, 0.05) 50%, transparent 51%);
+            background-size: 10px 10px;
+        }
+
+        .captcha-refresh {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin: 0 auto 15px;
+        }
+
+        .captcha-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: var(--secondary-bg);
+            border: none;
+            font-size: 16px;
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .captcha-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .captcha-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .captcha-button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .captcha-cancel {
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+        }
+
+        .captcha-verify {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .captcha-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .captcha-button:active {
+            transform: translateY(1px);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--purple-color);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Loader -->
+        <div class="loader-container" id="loader">
+            <div class="flex-loader">
+                <div class="flex-loader-circle"></div>
+                <div class="flex-loader-circle"></div>
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/%D9%A2%D9%A0%D9%A2%D9%A5%D9%A0%D9%A5%D9%A2%D9%A0_%D9%A1%D9%A8%D9%A1%D9%A3%D9%A3%D9%A4.jpg-s2YzT8uz1i8pji2yKjjpLpOWozHMLB.jpeg" alt="Flex TV Logo" class="loader-logo">
+            </div>
+            <div class="loader-text">جاري التحميل...</div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toast-container"></div>
+
+        <!-- Overlay -->
+        <div class="overlay" id="overlay"></div>
+
+        <!-- PIN Lock Modal -->
+        <div class="pin-modal" id="pin-modal">
+            <div class="pin-container">
+                <div class="pin-title">أدخل رمز القفل</div>
+                <div class="pin-input">
+                    <input type="password" maxlength="1" class="pin-digit" id="pin-1">
+                    <input type="password" maxlength="1" class="pin-digit" id="pin-2">
+                    <input type="password" maxlength="1" class="pin-digit" id="pin-3">
+                    <input type="password" maxlength="1" class="pin-digit" id="pin-4">
+                </div>
+                <div class="pin-buttons">
+                    <button class="pin-button pin-cancel" id="pin-cancel">إلغاء</button>
+                    <button class="pin-button pin-submit" id="pin-submit">تأكيد</button>
+                </div>
+                <div class="forgot-pin" id="forgot-pin">نسيت رمز الأمان؟</div>
+            </div>
+        </div>
+
+        <!-- Set PIN Modal -->
+        <div class="set-pin-modal" id="set-pin-modal">
+            <div class="set-pin-container">
+                <div class="set-pin-title">أدخل رمز القفل الجديد</div>
+                <div class="set-pin-input">
+                    <input type="password" maxlength="4" id="new-pin" placeholder="أدخل 4 أرقام">
+                </div>
+                <div class="set-pin-buttons">
+                    <button class="set-pin-button set-pin-cancel" id="set-pin-cancel">إلغاء</button>
+                    <button class="set-pin-button set-pin-save" id="set-pin-save">حفظ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change PIN Modal -->
+        <div class="change-pin-modal" id="change-pin-modal">
+            <div class="change-pin-container">
+                <div class="change-pin-title">تغيير رمز القفل</div>
+                <div class="change-pin-input">
+                    <input type="password" maxlength="4" id="change-new-pin" placeholder="الرمز الجديد">
+                </div>
+                <div class="change-pin-buttons">
+                    <button class="change-pin-button change-pin-cancel" id="change-pin-cancel">إلغاء</button>
+                    <button class="change-pin-button change-pin-save" id="change-pin-save">تغيير</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAPTCHA Modal -->
+        <div class="captcha-modal" id="captcha-modal">
+            <div class="captcha-container">
+                <div class="captcha-title">تحقق أنك لست روبوت</div>
+                <div class="captcha-image" id="captcha-image">
+                    <!-- CAPTCHA will be generated here -->
+                </div>
+                <button class="captcha-refresh" id="captcha-refresh">
+                    <i class="fas fa-sync-alt"></i> تحديث
+                </button>
+                <input type="text" class="captcha-input" id="captcha-input" placeholder="أدخل الرمز">
+                <div class="captcha-buttons">
+                    <button class="captcha-button captcha-cancel" id="captcha-cancel">إلغاء</button>
+                    <button class="captcha-button captcha-verify" id="captcha-verify">تحقق</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Container -->
+        <div class="search-container" id="search-container">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="البحث">
+                <button class="search-close-btn" id="search-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div class="search-results" id="search-results">
+            <!-- Search results will be added here -->
+        </div>
+
+        <!-- Side Menu -->
+        <div class="side-menu" id="side-menu">
+            <div class="side-menu-header">
+                <div class="side-menu-title">القائمة</div>
+                <button class="close-menu" id="close-menu"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="side-menu-content">
+                <div class="menu-section">
+                    <div class="menu-section-title">التواصل</div>
+                    <div class="social-links">
+                        <a href="https://t.me/IIIlIIv" target="_blank" class="social-link instagram"><i class="fab fa-telegram"></i></a>
+                        <a href="https://t.me/H_c_m_19" target="_blank" class="social-link tiktok"><i class="fab fa-telegram"></i></a>
+                        <a href="https://t.me/SPORTS4k2" target="_blank" class="social-link telegram"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+                <div class="menu-section">
+                    <div class="menu-section-title">الإعدادات</div>
+                    <div class="theme-switch">
+                        <span>الوضع المظلم</span>
+                        <label class="switch">
+                            <input type="checkbox" id="theme-toggle-checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <a href="#" class="menu-item" id="settings-link">
+                        <i class="fas fa-cog"></i>
+                        <span>الإعدادات</span>
+                    </a>
+                    <a href="#" class="menu-item" id="about-link">
+                        <i class="fas fa-info-circle"></i>
+                        <span>حول التطبيق</span>
+                    </a>
+                </div>
+                <div class="menu-section">
+                    <div class="menu-section-title">الحساب</div>
+                    <a href="#" class="menu-item" id="logout-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>تسجيل الخروج</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Page (Initially Visible) -->
+        <div id="login-page" class="page">
+            <div class="login-container">
+                <div class="login-bg"></div>
+                <div class="login-circles">
+                    <div class="login-circle"></div>
+                    <div class="login-circle"></div>
+                    <div class="login-circle"></div>
+                </div>
+                <div class="logo">Flex | TV</div>
+                <div class="login-form">
+                    <h2>أدخل رمز التفعيل</h2>
+                    <input type="text" id="activation-code" placeholder="رمز التفعيل">
+                    <button id="login-btn">دخول</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App (Initially Hidden) -->
+        <div id="main-app" class="page hidden">
+            <!-- Header -->
+            <header>
+                <div class="app-header">
+                    <button class="menu-btn" id="menu-btn"><i class="fas fa-bars"></i></button>
+                    <h1 class="app-title">Flex | TV</h1>
+                    <button class="search-btn" id="main-search-btn"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="notification-bar">
+                    <p>لا تجعل المباريات تلهيك عن ذكر الله</p>
+                    <button class="close-notification"><i class="fas fa-times"></i></button>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main>
+                <div class="section-header">
+                    <button class="all-channels-btn" id="all-channels-btn">
+                        <i class="fas fa-th"></i>
+                        <span>جميع القنوات</span>
+                    </button>
+                    <h2>الأقسام الرئيسية</h2>
+                    <div style="width: 36px;"></div> <!-- Spacer for centering -->
+                </div>
+
+                <!-- Categories -->
+                <div class="categories" id="categories-container">
+                    <!-- Categories will be dynamically added here -->
+                </div>
+            </main>
+        </div>
+
+        <!-- Channel Grid Page (Initially Hidden) -->
+        <div id="channel-grid" class="page hidden">
+            <header class="channel-header">
+                <button class="back-btn" id="back-to-main"><i class="fas fa-arrow-right"></i></button>
+                <h2 id="category-title">beIN Sports | SD</h2>
+                <div class="header-actions">
+                    <button class="search-btn" id="category-search-btn"><i class="fas fa-search"></i></button>
+                    <button class="refresh-btn"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </header>
+            
+            <div class="channels-wrap" id="channels-grid">
+                <!-- Channels will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- All Channels Page (Initially Hidden) -->
+        <div id="all-channels-page" class="page hidden">
+            <header class="channel-header">
+                <button class="back-btn" id="back-from-all-channels"><i class="fas fa-arrow-right"></i></button>
+                <h2>جميع القنوات</h2>
+                <div class="header-actions">
+                    <button class="search-btn" id="all-channels-search-btn"><i class="fas fa-search"></i></button>
+                    <button class="refresh-btn"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </header>
+            
+            <div class="channels-wrap" id="all-channels-grid">
+                <!-- All channels will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Highlights Page (Initially Hidden) -->
+        <div id="highlights-page" class="page hidden">
+            <header class="channel-header">
+                <button class="back-btn" id="back-to-highlights"><i class="fas fa-arrow-right"></i></button>
+                <h2>اهداف و ملخصات</h2>
+                <div class="header-actions">
+                    <button class="search-btn" id="highlights-search-btn"><i class="fas fa-search"></i></button>
+                    <button class="refresh-btn"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </header>
+            
+            <div class="highlights-container" id="highlights-container">
+                <!-- Highlights will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Video Player Page (Initially Hidden) -->
+        <div id="video-player-page" class="page hidden">
+            <header class="channel-header">
+                <button class="back-btn" id="back-from-video"><i class="fas fa-arrow-right"></i></button>
+                <h2 id="video-player-title">مشغل الفيديو</h2>
+                <div class="header-actions">
+                    <button class="refresh-btn"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </header>
+            
+            <div class="video-player-page">
+                <div class="video-container" id="video-container">
+                    <!-- Video player will be added here -->
+                </div>
+                <div class="video-info">
+                    <div class="video-title" id="video-title">عنوان الفيديو</div>
+                    <div class="video-desc" id="video-desc">وصف الفيديو</div>
+                </div>
+                <div class="related-videos">
+                    <h3>المزيد من الأهداف والملخصات</h3>
+                    <div class="related-video-grid" id="related-videos-grid">
+                        <!-- Related videos will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorites Page (Initially Hidden) -->
+        <div id="favorites-page" class="page hidden">
+            <header class="channel-header">
+                <h2>المفضلة</h2>
+                <div class="header-actions">
+                    <button class="search-btn" id="favorites-search-btn"><i class="fas fa-search"></i></button>
+                    <button class="refresh-btn"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </header>
+            
+            <div class="favorites-container" id="favorites-container">
+                <div class="no-favorites">
+                    <i class="fas fa-heart" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <p>لا توجد قنوات مفضلة</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Page (Initially Hidden) -->
+        <div id="settings-page" class="page hidden">
+            <header class="channel-header">
+                <button class="back-btn" id="back-from-settings"><i class="fas fa-arrow-right"></i></button>
+                <h2>الإعدادات</h2>
+                <div class="header-actions">
+                    <button class="refresh-btn"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </header>
+            
+            <div class="settings-page">
+                <div class="settings-section">
+                    <div class="settings-section-title">المظهر</div>
+                    <div class="settings-item">
+                        <div class="settings-item-title">الوضع المظلم</div>
+                        <label class="switch">
+                            <input type="checkbox" id="settings-theme-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- New Settings Sections -->
+                <div class="settings-section">
+                    <div class="settings-section-title">الأمان والخصوصية</div>
+                    <div class="settings-item" id="set-app-lock">
+                        <div class="settings-item-title">قفل التطبيق برمز</div>
+                        <label class="switch">
+                            <input type="checkbox" id="app-lock-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item" id="change-pin-item">
+                        <div class="settings-item-title">تغيير رمز الأمان</div>
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-title">حماية البيانات</div>
+                        <label class="switch">
+                            <input type="checkbox" id="data-protection-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <div class="settings-section-title">التخصيص</div>
+                    <div class="settings-item" id="clear-history">
+                        <div class="settings-item-title">مسح سجل المشاهدة</div>
+                        <i class="fas fa-trash"></i>
+                    </div>
+                    <div class="settings-item" id="clear-cache">
+                        <div class="settings-item-title">مسح ذاكرة التخزين المؤقت</div>
+                        <i class="fas fa-broom"></i>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <div class="settings-section-title">الحساب</div>
+                    <div class="settings-item" id="logout-btn">
+                        <div class="settings-item-title">تسجيل الخروج</div>
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page (Initially Hidden) -->
+        <div id="about-page" class="page hidden">
+            <header class="channel-header">
+                <button class="back-btn" id="back-from-about"><i class="fas fa-arrow-right"></i></button>
+                <h2>حول التطبيق</h2>
+                <div class="header-actions">
+                    <button class="refresh-btn"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </header>
+            
+            <div class="about-page">
+                <div class="about-logo">
+                    <img src="https://ar-hosting.pages.dev/1747660139861.jpg" alt="FLEX Logo">
+                </div>
+                <div class="about-title">Flex TV</div>
+                <div class="about-version">الإصدار 1.0.0</div>
+                
+                <div class="about-description">
+                    تطبيق Flex TV هو منصة متكاملة لمشاهدة القنوات الرياضية المشفرة والمفتوحة بجودة عالية. يوفر التطبيق مجموعة واسعة من القنوات الرياضية من مختلف الباقات العالمية.
+                </div>
+                
+                <div class="about-section">
+                    <div class="about-section-title">المميزات</div>
+                    <div class="about-section-content">
+                        <ul style="padding-right: 20px; margin-bottom: 15px;">
+                            <li>مشاهدة القنوات الرياضية بجودات مختلفة</li>
+                            <li>أهداف وملخصات المباريات</li>
+                            <li>واجهة سهلة الاستخدام</li>
+                            <li>دعم الوضع المظلم والفاتح</li>
+                            <li>تحديثات مستمرة للمحتوى</li>
+                            <li>إعدادات متقدمة للأمان والخصوصية</li>
+                            <li>تصميم متجاوب يعمل على جميع الأجهزة</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="about-section">
+                    <div class="about-section-title">التواصل</div>
+                    <div class="about-section-content">
+                        <div class="about-contact" id="go-to-account">
+                            <i class="fab fa-telegram"></i>
+                            <span>@SPORTS4k2</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-section">
+                    <div class="about-section-title">حقوق الملكية</div>
+                    <div class="about-section-content">
+                        جميع الحقوق محفوظة © 2025 Flex TV. هذا التطبيق مخصص للاستخدام الشخصي فقط.
+                    </div>
+                </div>
+                
+                <button class="share-app-btn" id="share-app-btn">
+                    <i class="fas fa-share-alt"></i>
+                    <span>مشاركة التطبيق</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer Navigation (Fixed at bottom) -->
+        <footer>
+            <!-- Removed bottom navigation as requested -->
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginPage = document.getElementById("login-page");
+        const mainApp = document.getElementById("main-app");
+        const channelGrid = document.getElementById("channel-grid");
+        const allChannelsPage = document.getElementById("all-channels-page");
+        const highlightsPage = document.getElementById("highlights-page");
+        const videoPlayerPage = document.getElementById("video-player-page");
+        const settingsPage = document.getElementById("settings-page");
+        const aboutPage = document.getElementById("about-page");
+        const favoritesPage = document.getElementById("favorites-page");
+        const sideMenu = document.getElementById("side-menu");
+        const overlay = document.getElementById("overlay");
+        const loader = document.getElementById("loader");
+        const toastContainer = document.getElementById("toast-container");
+        const pinModal = document.getElementById("pin-modal");
+        const setPinModal = document.getElementById("set-pin-modal");
+        const changePinModal = document.getElementById("change-pin-modal");
+        const captchaModal = document.getElementById("captcha-modal");
+        const searchContainer = document.getElementById("search-container");
+        
+        const loginBtn = document.getElementById("login-btn");
+        const activationCodeInput = document.getElementById("activation-code");
+        const categoryTitle = document.getElementById("category-title");
+        const channelsGrid = document.getElementById("channels-grid");
+        const allChannelsGrid = document.getElementById("all-channels-grid");
+        const categoriesContainer = document.getElementById("categories-container");
+        const highlightsContainer = document.getElementById("highlights-container");
+        const videoContainer = document.getElementById("video-container");
+        const videoTitle = document.getElementById("video-title");
+        const videoDesc = document.getElementById("video-desc");
+        const videoPlayerTitle = document.getElementById("video-player-title");
+        const relatedVideosGrid = document.getElementById("related-videos-grid");
+        const searchInput = document.getElementById("search-input");
+        const searchResults = document.getElementById("search-results");
+        const searchCloseBtn = document.getElementById("search-close-btn");
+        
+        const menuBtn = document.getElementById("menu-btn");
+        const closeMenuBtn = document.getElementById("close-menu");
+        const backToMainBtn = document.getElementById("back-to-main");
+        const backFromAllChannelsBtn = document.getElementById("back-from-all-channels");
+        const backFromVideoBtn = document.getElementById("back-from-video");
+        const backFromSettingsBtn = document.getElementById("back-from-settings");
+        const backFromAboutBtn = document.getElementById("back-from-about");
+        const backToHighlightsBtn = document.getElementById("back-to-highlights");
+        const allChannelsBtn = document.getElementById("all-channels-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+        const logoutLink = document.getElementById("logout-link");
+        const settingsLink = document.getElementById("settings-link");
+        const aboutLink = document.getElementById("about-link");
+        const shareAppBtn = document.getElementById("share-app-btn");
+        const goToAccount = document.getElementById("go-to-account");
+        
+        const themeToggleCheckbox = document.getElementById("theme-toggle-checkbox");
+        const settingsThemeToggle = document.getElementById("settings-theme-toggle");
+        const refreshBtns = document.querySelectorAll(".refresh-btn");
+        const closeNotification = document.querySelector(".close-notification");
+        const mainSearchBtn = document.getElementById("main-search-btn");
+        const categorySearchBtn = document.getElementById("category-search-btn");
+        const allChannelsSearchBtn = document.getElementById("all-channels-search-btn");
+        const highlightsSearchBtn = document.getElementById("highlights-search-btn");
+        const favoritesSearchBtn = document.getElementById("favorites-search-btn");
+        const appLockToggle = document.getElementById("app-lock-toggle");
+        const dataProtectionToggle = document.getElementById("data-protection-toggle");
+        const setAppLock = document.getElementById("set-app-lock");
+        const clearHistory = document.getElementById("clear-history");
+        const clearCache = document.getElementById("clear-cache");
+        const changePinItem = document.getElementById("change-pin-item");
+        const forgotPin = document.getElementById("forgot-pin");
+        
+        // PIN Modal Elements
+        const pinDigits = [
+            document.getElementById("pin-1"),
+            document.getElementById("pin-2"),
+            document.getElementById("pin-3"),
+            document.getElementById("pin-4")
+        ];
+        const pinSubmit = document.getElementById("pin-submit");
+        const pinCancel = document.getElementById("pin-cancel");
+        const newPin = document.getElementById("new-pin");
+        const setPinSave = document.getElementById("set-pin-save");
+        const setPinCancel = document.getElementById("set-pin-cancel");
+        
+        // Change PIN Modal Elements
+        const changeNewPin = document.getElementById("change-new-pin");
+        const changePinSave = document.getElementById("change-pin-save");
+        const changePinCancel = document.getElementById("change-pin-cancel");
+        
+        // CAPTCHA Modal Elements
+        const captchaImage = document.getElementById("captcha-image");
+        const captchaInput = document.getElementById("captcha-input");
+        const captchaRefresh = document.getElementById("captcha-refresh");
+        const captchaVerify = document.getElementById("captcha-verify");
+        const captchaCancel = document.getElementById("captcha-cancel");
+        
+        // App Data
+        const appData = {
+            // Categories data
+            categories: [
+                { 
+                    id: "live", 
+                    name: "أثناء المباريات | LIVE", 
+                    icon: "https://ar-hosting.pages.dev/1746808197541.jpg" 
+                },
+                { 
+                    id: "premium", 
+                    name: "بين أيرثلينك | BEIN Earthlink", 
+                    icon: "https://ar-hosting.pages.dev/1747741878117.jpg" 
+                },
+                { 
+                    id: "alfajer", 
+                    name: "الفجر الجديد | AL Fajer", 
+                    icon: "https://ar-hosting.pages.dev/1747739348645.jpg" 
+                },
+                { 
+                    id: "alwan", 
+                    name: "باقة ألوان | ALwan", 
+                    icon: "https://ar-hosting.pages.dev/1747739351048.jpg" 
+                },
+                { 
+                    id: "bein-hd", 
+                    name: "تـود | beIN TOD", 
+                    icon: "https://ar-hosting.pages.dev/1747739351850.jpg" 
+                },
+                { 
+                    id: "bein-sd", 
+                    name: "بين سبورت | beIN Sports", 
+                    icon: "https://ar-hosting.pages.dev/1747739350249.jpg" 
+                },
+                { 
+                    id: "bein-low", 
+                    name: "متعدد | SSC Sports", 
+                    icon: "https://ar-hosting.pages.dev/1747739349446.jpg" 
+                },
+                { 
+                    id: "Varied", 
+                    name: "قنوات متنوعة | Varied", 
+                    icon: "https://ar-hosting.pages.dev/1747933951055.jpg" 
+                },
+                { 
+                    id: "bein-sd-lite", 
+                    name: "تيست | TEST", 
+                    icon: "https://ar-hosting.pages.dev/1747933941938.jpg" 
+                }
+            ],
+
+            // Channels data for each category
+            channels: {
+                "bein-sd": [
+                    { 
+                        id: 1, 
+                        name: "beIN Sport 1", 
+                        logo: "https://ar-hosting.pages.dev/1745675959066.jpg", 
+                        url: "go:1" 
+                    },
+                    { 
+                        id: 2, 
+                        name: "beIN Sport 2", 
+                        logo: "https://ar-hosting.pages.dev/1745675958262.jpg", 
+                        url: "go:2" 
+                    },
+                    { 
+                        id: 3, 
+                        name: "beIN Sport 3", 
+                        logo: "https://ar-hosting.pages.dev/1745675959934.jpg", 
+                        url: "go:3" 
+                    },
+                    { 
+                        id: 4, 
+                        name: "beIN Sport 4", 
+                        logo: "https://ar-hosting.pages.dev/1745675960701.jpg", 
+                        url: "go:4" 
+                    },
+                    { 
+                        id: 5, 
+                        name: "beIN Sport 5", 
+                        logo: "https://ar-hosting.pages.dev/1745675966573.jpg", 
+                        url: "go:5" 
+                    },
+                    { 
+                        id: 6, 
+                        name: "beIN Sport 6", 
+                        logo: "https://ar-hosting.pages.dev/1745675967420.jpg", 
+                        url: "go:6" 
+                    },
+                    { 
+                        id: 7, 
+                        name: "beIN Sport 7", 
+                        logo: "https://ar-hosting.pages.dev/1745675968218.jpg", 
+                        url: "go:7" 
+                    },
+                    { 
+                        id: 8, 
+                        name: "beIN Sport 8", 
+                        logo: "https://ar-hosting.pages.dev/1745675969073.jpg", 
+                        url: "go:8" 
+                    },
+                    { 
+                        id: 9, 
+                        name: "beIN Sport 9", 
+                        logo: "https://ar-hosting.pages.dev/1745675965759.jpg", 
+                        url: "go:9" 
+                    }
+                ],
+                "bein-hd": [
+                    { 
+                        id: 1, 
+                        name: "beIN TOD 1", 
+                        logo: "https://ar-hosting.pages.dev/1747663391505.jpg", 
+                        url: "go:10" 
+                    },
+                    { 
+                        id: 2, 
+                        name: "beIN TOD 2", 
+                        logo: "https://ar-hosting.pages.dev/1747663391505.jpg", 
+                        url: "go:11" 
+                    },
+                    { 
+                        id: 3, 
+                        name: "beIN TOD 3", 
+                        logo: "https://ar-hosting.pages.dev/1747663391505.jpg", 
+                        url: "go:12" 
+                    },
+                    { 
+                        id: 4, 
+                        name: "beIN TOD 4", 
+                        logo: "https://ar-hosting.pages.dev/1747663391505.jpg", 
+                        url: "go:13" 
+                    },
+                    { 
+                        id: 5, 
+                        name: "beIN TOD 5", 
+                        logo: "https://ar-hosting.pages.dev/1747663391505.jpg", 
+                        url: "go:14" 
+                    },
+                    { 
+                        id: 6, 
+                        name: "beIN TOD 6", 
+                        logo: "https://ar-hosting.pages.dev/1747663391505.jpg", 
+                        url: "go:15" 
+                    },
+                    { 
+                        id: 7, 
+                        name: "beIN TOD 7", 
+                        logo: "https://ar-hosting.pages.dev/1747663391505.jpg", 
+                        url: "go:16" 
+                    },
+                    { 
+                        id: 8, 
+                        name: "beIN TOD 8", 
+                        logo: "https://ar-hosting.pages.dev/1747663391505.jpg", 
+                        url: "go:17" 
+                    },
+                    { 
+                        id: 9, 
+                        name: "beIN TOD 9", 
+                        logo: "https://ar-hosting.pages.dev/1747663391505.jpg", 
+                        url: "go:18" 
+                    }
+                ],
+                "bein-low": [
+                    { 
+                        id: 1, 
+                        name: "SSC Sport 1", 
+                        logo: "https://ar-hosting.pages.dev/1747663392303.jpg", 
+                        url: "go:19" 
+                    },
+                    { 
+                        id: 2, 
+                        name: "SSC Sport 2", 
+                        logo: "https://ar-hosting.pages.dev/1747663392303.jpg", 
+                        url: "go:20" 
+                    },
+                    { 
+                        id: 3, 
+                        name: "SSC Sport 3", 
+                        logo: "https://ar-hosting.pages.dev/1747663392303.jpg", 
+                        url: "go:21" 
+                    },
+                    { 
+                        id: 4, 
+                        name: "SSC Sport 4", 
+                        logo: "https://ar-hosting.pages.dev/1747663392303.jpg", 
+                        url: "go:22" 
+                    },
+                    { 
+                        id: 5, 
+                        name: "SSC Sport 5", 
+                        logo: "https://ar-hosting.pages.dev/1747663392303.jpg", 
+                        url: "go:23" 
+                    },
+                    { 
+                        id: 6, 
+                        name: "Extra Sport 1", 
+                        logo: "https://ar-hosting.pages.dev/1747663392303.jpg", 
+                        url: "go:24" 
+                    },
+                    { 
+                        id: 7, 
+                        name: "Extra Sport 2", 
+                        logo: "https://ar-hosting.pages.dev/1747663392303.jpg", 
+                        url: "go:25" 
+                    },
+                    { 
+                        id: 8, 
+                        name: "Extra Sport 3", 
+                        logo: "https://ar-hosting.pages.dev/1747663392303.jpg", 
+                        url: "go:26" 
+                    }
+                ],
+                "live": [
+                    { 
+                        id: 1, 
+                        name: "مباراة 1 مباشر", 
+                        logo: "https://via.placeholder.com/120/444444/ffffff?text=LIVE+1", 
+                        url: "https://example.com/live1" 
+                    },
+                    { 
+                        id: 2, 
+                        name: "مباراة 2 مباشر", 
+                        logo: "https://via.placeholder.com/120/444444/ffffff?text=LIVE+2", 
+                        url: "https://example.com/live2" 
+                    }
+                ],
+                
+                "Varied": [
+                    { 
+                        id: 1, 
+                        name: "مباراة 1 مباشر", 
+                        logo: "https://via.placeholder.com/120/444444/ffffff?text=LIVE+1", 
+                        url: "https://example.com/live1" 
+                    },
+                    { 
+                        id: 2, 
+                        name: "مباراة 2 مباشر", 
+                        logo: "https://via.placeholder.com/120/444444/ffffff?text=LIVE+2", 
+                        url: "https://example.com/live2" 
+                    }
+                ],
+                
+                "premium": [
+                    { 
+                        id: 1, 
+                        name: "bein Sport 1", 
+                        logo: "https://ar-hosting.pages.dev/1747741878117.jpg", 
+                        url: "go:M1" 
+                    },
+                    { 
+                        id: 2, 
+                        name: "beIN Sport 2", 
+                        logo: "https://ar-hosting.pages.dev/1747741878117.jpg", 
+                        url: "go:M2" 
+                    },
+                    {  
+                        id: 3, 
+                        name: "beIN Sport 3", 
+                        logo: "https://ar-hosting.pages.dev/1747741878117.jpg", 
+                        url: "go:M3" 
+                    },
+                    { 
+                        id: 4, 
+                        name: "beIN Sport 4", 
+                        logo: "https://ar-hosting.pages.dev/1747741878117.jpg", 
+                        url: "go:M4" 
+                    },
+                    { 
+                        id: 5, 
+                        name: "beIN Sport 5", 
+                        logo: "https://ar-hosting.pages.dev/1747741878117.jpg", 
+                        url: "go:M5" 
+                    },
+                    { 
+                        id: 6, 
+                        name: "beIN Sport 6", 
+                        logo: "https://ar-hosting.pages.dev/1747741878117.jpg", 
+                        url: "go:M6" 
+                    },
+                    { 
+                        id: 7, 
+                        name: "beIN Sport 7", 
+                        logo: "https://ar-hosting.pages.dev/1747741878117.jpg", 
+                        url: "go:M7" 
+                    },
+                    { 
+                        id: 8, 
+                        name: "beIN Sport 8", 
+                        logo: "https://ar-hosting.pages.dev/1747741878117.jpg", 
+                        url: "go:M8" 
+                    },
+                    { 
+                        id: 9, 
+                        name: "beIN Sport 9", 
+                        logo: "https://ar-hosting.pages.dev/1747741878117.jpg", 
+                        url: "go:M9" 
+                    }
+                ],
+                "alfajer": [
+                    { 
+                        id: 1, 
+                        name: "الفجر 1", 
+                        logo: "https://ar-hosting.pages.dev/1747739348645.jpg", 
+                        url: "go:SD1" 
+                    },
+                    { 
+                        id: 2, 
+                        name: "الفجر 2", 
+                        logo: "https://ar-hosting.pages.dev/1747739348645.jpg", 
+                        url: "go:SD2" 
+                    },
+                    { 
+                        id: 3, 
+                        name: "الفجر 3", 
+                        logo: "https://ar-hosting.pages.dev/1747739348645.jpg", 
+                        url: "go:SD3" 
+                    },
+                    { 
+                        id: 4, 
+                        name: "الفجر 4", 
+                        logo: "https://ar-hosting.pages.dev/1747739348645.jpg", 
+                        url: "go:SD4" 
+                    },
+                    { 
+                        id: 5, 
+                        name: "الفجر 5", 
+                        logo: "https://ar-hosting.pages.dev/1747739348645.jpg", 
+                        url: "go:SD5"        	
+                    }
+                ],
+                "alwan": [
+                    { 
+                        id: 1, 
+                        name: "الوان 1", 
+                        logo: "https://c.top4top.io/p_342748nvj0.png", 
+                        url: "go:A" 
+                    },
+                    { 
+                        id: 2, 
+                        name: "الوان 2", 
+                        logo: "https://d.top4top.io/p_34272yqc41.png", 
+                        url: "go:B" 
+                    },
+                    { 
+                        id: 3, 
+                        name: "الوان 3", 
+                        logo: "https://h.top4top.io/p_3427woyvk0.png", 
+                        url: "go:C" 
+                    },
+                    { 
+                        id: 4, 
+                        name: "الوان 4", 
+                        logo: "https://f.top4top.io/p_3427ealtp3.png", 
+                        url: "go:D" 
+                    }
+                ],
+                "bein-sd-lite": [
+                    { 
+                        id: 1, 
+                        name: "beIN Lite 1", 
+                        logo: "https://via.placeholder.com/120/444444/ffffff?text=beIN+LITE+1", 
+                        url: "https://example.com/beinlite1" 
+                    },
+                    { 
+                        id: 2, 
+                        name: "beIN Lite 2", 
+                        logo: "https://via.placeholder.com/120/444444/ffffff?text=beIN+LITE+2", 
+                        url: "https://example.com/beinlite2" 
+                    }
+                ],
+            },
+
+            // Highlights data
+            highlights: [
+                {
+                    id: 1,
+                    title: "ريال مدريد 3 - 1 برشلونة",
+                    description: "ملخص مباراة الكلاسيكو",
+                    image: "https://via.placeholder.com/400/444444/ffffff?text=MATCH+HIGHLIGHT",
+                    url: "https://ar-hosting.pages.dev/1746808496962.mp4"
+                },
+                {
+                    id: 2,
+                    title: "مانشستر سيتي 2 - 0 ارسنال",
+                    description: "اهداف المباراة كاملة",
+                    image: "https://via.placeholder.com/400/444444/ffffff?text=MATCH+HIGHLIGHT",
+                    url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+                },
+                {
+                    id: 3,
+                    title: "ليفربول 4 - 1 تشيلسي",
+                    description: "ملخص المباراة واهداف",
+                    image: "https://via.placeholder.com/400/444444/ffffff?text=MATCH+HIGHLIGHT",
+                    url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+                },
+                {
+                    id: 4,
+                    title: "باريس سان جيرمان 3 - 0 ليون",
+                    description: "اهداف المباراة HD",
+                    image: "https://via.placeholder.com/400/444444/ffffff?text=MATCH+HIGHLIGHT",
+                    url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+                }
+            ],
+
+            // Navigation history (for back button)
+            navigationHistory: [],
+            
+            // Current video (for video player)
+            currentVideo: null,
+            
+            // App settings
+            settings: {
+                appLock: false,
+                pin: null,
+                dataProtection: true
+            },
+            
+            // CAPTCHA data
+            captcha: {
+                code: '',
+                userInput: ''
+            }
+        };
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 1000);
+        }
+
+        // Show loader
+        function showLoader() {
+            loader.classList.add("active");
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    loader.classList.remove("active");
+                    resolve();
+                }, 1500); // 1.5 seconds for the improved loader animation
+            });
+        }
+
+        // Generate CAPTCHA
+        function generateCaptcha() {
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let result = '';
+            for (let i = 0; i < 5; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            appData.captcha.code = result;
+            captchaImage.textContent = result;
+        }
+
+        // Show CAPTCHA modal
+        function showCaptchaModal() {
+            generateCaptcha();
+            captchaModal.classList.add("active");
+            captchaInput.focus();
+            captchaInput.value = "";
+        }
+
+        // Hide CAPTCHA modal
+        function hideCaptchaModal() {
+            captchaModal.classList.remove("active");
+        }
+
+        // Verify CAPTCHA
+        function verifyCaptcha() {
+            const userInput = captchaInput.value.trim().toUpperCase();
+            if (userInput === appData.captcha.code) {
+                hideCaptchaModal();
+                showSetPinModal(); // Changed to directly show set pin modal
+                showToast("تم التحقق بنجاح");
+            } else {
+                showToast("رمز التحقق غير صحيح");
+                generateCaptcha();
+                captchaInput.value = "";
+                captchaInput.focus();
+            }
+        }
+
+        // Check if user is already logged in
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem("sportStreamLoggedIn");
+            if (isLoggedIn === "true") {
+                // Check if app lock is enabled
+                const settings = localStorage.getItem("sportStreamSettings");
+                if (settings) {
+                    const parsedSettings = JSON.parse(settings);
+                    if (parsedSettings.appLock && parsedSettings.pin) {
+                        appData.settings = parsedSettings;
+                        showPinModal();
+                    } else {
+                        showMainApp();
+                    }
+                } else {
+                    showMainApp();
+                }
+            }
+        }
+
+        // Show PIN modal
+        function showPinModal() {
+            pinModal.classList.add("active");
+            pinDigits[0].focus();
+            
+            // Clear previous input
+            pinDigits.forEach(digit => {
+                digit.value = "";
+            });
+        }
+
+        // Hide PIN modal
+        function hidePinModal() {
+            pinModal.classList.remove("active");
+        }
+
+        // Show Set PIN modal
+        function showSetPinModal() {
+            setPinModal.classList.add("active");
+            newPin.focus();
+            newPin.value = "";
+        }
+
+        // Hide Set PIN modal
+        function hideSetPinModal() {
+            setPinModal.classList.remove("active");
+        }
+
+        // Show Change PIN modal
+        function showChangePinModal() {
+            changePinModal.classList.add("active");
+            changeNewPin.focus();
+            changeNewPin.value = "";
+        }
+
+        // Hide Change PIN modal
+        function hideChangePinModal() {
+            changePinModal.classList.remove("active");
+        }
+
+        // Verify PIN
+        function verifyPin() {
+            const enteredPin = pinDigits.map(digit => digit.value).join("");
+            if (enteredPin === appData.settings.pin) {
+                hidePinModal();
+                showMainApp();
+            } else {
+                showToast("رمز القفل غير صحيح");
+                pinDigits.forEach(digit => {
+                    digit.value = "";
+                });
+                pinDigits[0].focus();
+            }
+        }
+
+        // Set PIN
+        function setPin() {
+            const pin = newPin.value.trim();
+            if (pin.length === 4 && /^\d+$/.test(pin)) {
+                appData.settings.pin = pin;
+                appData.settings.appLock = true;
+                saveSettings();
+                hideSetPinModal();
+                showToast("تم تعيين رمز القفل بنجاح");
+                
+                // Update UI
+                appLockToggle.checked = true;
+            } else {
+                showToast("الرجاء إدخال 4 أرقام");
+            }
+        }
+
+        // Change PIN
+        function changePin() {
+            const newPinValue = changeNewPin.value.trim();
+            
+            if (newPinValue.length === 4 && /^\d+$/.test(newPinValue)) {
+                appData.settings.pin = newPinValue;
+                saveSettings();
+                hideChangePinModal();
+                showToast("تم تغيير رمز القفل بنجاح");
+            } else {
+                showToast("الرجاء إدخال 4 أرقام للرمز الجديد");
+            }
+        }
+
+        // Toggle app lock
+        function toggleAppLock() {
+            if (!appData.settings.appLock) {
+                // Enable app lock
+                showSetPinModal();
+            } else {
+                // Disable app lock
+                appData.settings.appLock = false;
+                appData.settings.pin = null;
+                saveSettings();
+                showToast("تم إلغاء قفل التطبيق");
+                
+                // Update UI
+                appLockToggle.checked = false;
+            }
+        }
+
+        // Toggle data protection
+        function toggleDataProtection() {
+            appData.settings.dataProtection = !appData.settings.dataProtection;
+            saveSettings();
+            
+            // Update UI
+            dataProtectionToggle.checked = appData.settings.dataProtection;
+            
+            showToast(`تم ${appData.settings.dataProtection ? 'تفعيل' : 'إلغاء'} حماية البيانات`);
+        }
+
+        // Clear history
+        function clearHistoryData() {
+            localStorage.removeItem("sportStreamHistory");
+            showToast("تم مسح سجل المشاهدة بنجاح");
+        }
+
+        // Clear cache
+        function clearCacheData() {
+            // Clear all localStorage except login status and settings
+            const loginStatus = localStorage.getItem("sportStreamLoggedIn");
+            const settings = localStorage.getItem("sportStreamSettings");
+            
+            localStorage.clear();
+            
+            if (loginStatus) {
+                localStorage.setItem("sportStreamLoggedIn", loginStatus);
+            }
+            
+            if (settings) {
+                localStorage.setItem("sportStreamSettings", settings);
+            }
+            
+            showToast("تم مسح ذاكرة التخزين المؤقت بنجاح");
+        }
+
+        // Login function
+        function login() {
+            const code = activationCodeInput.value.trim();
+            if (code === "9999") {
+                localStorage.setItem("sportStreamLoggedIn", "true");
+                showLoader().then(() => {
+                    showMainApp();
+                });
+            } else {
+                showToast("رمز التفعيل غير صحيح، الرجاء اداخل الرمز الصحيح");
+            }
+        }
+
+        // Show main app
+        function showMainApp() {
+            hideAllPages();
+            mainApp.classList.remove("hidden");
+            loadCategories();
+            appData.navigationHistory = [];
+        }
+
+        // Show channel grid
+        function showChannelGrid(category) {
+            // Save current page to navigation history
+            appData.navigationHistory.push("main");
+            
+            hideAllPages();
+            showLoader().then(() => {
+                channelGrid.classList.remove("hidden");
+                
+                // Update category title
+                const categoryObj = appData.categories.find(cat => cat.id === category);
+                categoryTitle.textContent = categoryObj ? categoryObj.name : category;
+                
+                // Load channels
+                loadChannels(category);
+            });
+        }
+
+        // Show all channels
+        function showAllChannels() {
+            // Save current page to navigation history
+            appData.navigationHistory.push("main");
+            
+            hideAllPages();
+            showLoader().then(() => {
+                allChannelsPage.classList.remove("hidden");
+                loadAllChannels();
+            });
+        }
+
+        // Show highlights page
+        function showHighlightsPage() {
+            hideAllPages();
+            highlightsPage.classList.remove("hidden");
+            loadHighlights();
+            appData.navigationHistory = [];
+        }
+
+        // Show favorites page
+        function showFavoritesPage() {
+            hideAllPages();
+            favoritesPage.classList.remove("hidden");
+            loadFavorites();
+            appData.navigationHistory = [];
+        }
+
+        // Show video player
+        function showVideoPlayer(video) {
+            // Save current page to navigation history
+            appData.navigationHistory.push("highlights");
+            
+            appData.currentVideo = video;
+            hideAllPages();
+            showLoader().then(() => {
+                videoPlayerPage.classList.remove("hidden");
+                
+                // Set video info
+                videoTitle.textContent = video.title;
+                videoDesc.textContent = video.description;
+                videoPlayerTitle.textContent = video.title;
+                
+                // Create video player
+                videoContainer.innerHTML = `
+                    <iframe src="${video.url}" frameborder="0" allowfullscreen></iframe>
+                `;
+                
+                // Load related videos
+                loadRelatedVideos(video.id);
+            });
+        }
+
+        // Show settings page
+        function showSettingsPage() {
+            // Save current page to navigation history
+            appData.navigationHistory.push("main");
+            
+            hideAllPages();
+            settingsPage.classList.remove("hidden");
+            
+            // Sync theme toggle
+            settingsThemeToggle.checked = !document.body.classList.contains("light-mode");
+            
+            // Sync other settings
+            appLockToggle.checked = appData.settings.appLock;
+            dataProtectionToggle.checked = appData.settings.dataProtection;
+        }
+
+        // Show about page
+        function showAboutPage() {
+            hideAllPages();
+            aboutPage.classList.remove("hidden");
+        }
+
+        // Hide all pages
+        function hideAllPages() {
+            loginPage.classList.add("hidden");
+            mainApp.classList.add("hidden");
+            channelGrid.classList.add("hidden");
+            allChannelsPage.classList.add("hidden");
+            highlightsPage.classList.add("hidden");
+            videoPlayerPage.classList.add("hidden");
+            settingsPage.classList.add("hidden");
+            aboutPage.classList.add("hidden");
+            favoritesPage.classList.add("hidden");
+        }
+
+        // Toggle side menu
+        function toggleSideMenu() {
+            sideMenu.classList.toggle("open");
+            overlay.classList.toggle("active");
+        }
+
+        // Toggle search bar
+        function toggleSearchBar() {
+            searchContainer.classList.toggle('active');
+            if (searchContainer.classList.contains('active')) {
+                searchInput.focus();
+                searchInput.value = '';
+                performSearch(''); // Initialize search with empty query to show all channels
+            } else {
+                searchInput.value = '';
+                searchResults.classList.remove('active');
+            }
+        }
+
+        // Load categories
+        function loadCategories() {
+            categoriesContainer.innerHTML = "";
+            
+            appData.categories.forEach((category, index) => {
+                const categoryItem = document.createElement("div");
+                categoryItem.className = "category-item";
+                categoryItem.setAttribute("data-category", category.id);
+                categoryItem.style.animationDelay = `${0.1 * index}s`;
+                
+                categoryItem.innerHTML = `
+                    <div class="category-content">
+                        <img src="${category.icon}" alt="${category.name}" class="category-icon">
+                        <span>${category.name}</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                `;
+                
+                categoryItem.addEventListener("click", () => {
+                    showChannelGrid(category.id);
+                });
+                
+                categoriesContainer.appendChild(categoryItem);
+            });
+        }
+
+        // Load channels for a category
+        function loadChannels(category) {
+            // Clear existing channels
+            channelsGrid.innerHTML = "";
+            
+            // Get channels for the selected category
+            const channels = appData.channels[category] || [];
+            
+            // Create channel cards
+            channels.forEach((channel, index) => {
+                const channelCard = document.createElement("div");
+                channelCard.className = "channel-card";
+                channelCard.style.animationDelay = `${0.05 * index}s`;
+                
+                channelCard.innerHTML = `
+                    <img src="${channel.logo}" alt="${channel.name}" class="channel-logo">
+                    <div class="channel-name">${channel.name}</div>
+                `;
+                
+                // Add click event to channel card
+                channelCard.addEventListener("click", () => {
+                    // Open channel URL in a new tab
+                    window.location.href = channel.url;
+                });
+                
+                channelsGrid.appendChild(channelCard);
+            });
+        }
+
+        // Load all channels
+        function loadAllChannels() {
+            // Clear existing channels
+            allChannelsGrid.innerHTML = "";
+            
+            // Get all channels
+            let allChannels = [];
+            
+            // Combine all channels from all categories
+            for (const category in appData.channels) {
+                allChannels = [...allChannels, ...appData.channels[category]];
+            }
+            
+            // Sort channels by ID
+            allChannels.sort((a, b) => a.id - b.id);
+            
+            // Create channel cards
+            allChannels.forEach((channel, index) => {
+                const channelCard = document.createElement("div");
+                channelCard.className = "channel-card";
+                channelCard.style.animationDelay = `${0.05 * index}s`;
+                
+                channelCard.innerHTML = `
+                    <img src="${channel.logo}" alt="${channel.name}" class="channel-logo">
+                    <div class="channel-name">${channel.name}</div>
+                `;
+                
+                // Add click event to channel card
+                channelCard.addEventListener("click", () => {
+                    // Open channel URL in a new tab
+                    window.location.href = channel.url;
+                });
+                
+                allChannelsGrid.appendChild(channelCard);
+            });
+        }
+
+        // Load highlights
+        function loadHighlights() {
+            highlightsContainer.innerHTML = "";
+            
+            appData.highlights.forEach((highlight, index) => {
+                const highlightItem = document.createElement("div");
+                highlightItem.className = "highlight-item";
+                highlightItem.style.animationDelay = `${0.1 * index}s`;
+                
+                highlightItem.innerHTML = `
+                    <img src="${highlight.image}" alt="${highlight.title}">
+                    <div class="highlight-info">
+                        <div class="highlight-title">${highlight.title}</div>
+                        <div class="highlight-desc">${highlight.description}</div>
+                    </div>
+                `;
+                
+                highlightItem.addEventListener("click", () => {
+                    showVideoPlayer(highlight);
+                });
+                
+                highlightsContainer.appendChild(highlightItem);
+            });
+        }
+
+        // Load favorites
+        function loadFavorites() {
+            // This is a placeholder - in a real app, you'd load from localStorage
+            const favoritesContainer = document.getElementById("favorites-container");
+            favoritesContainer.innerHTML = `
+                <div class="no-favorites">
+                    <i class="fas fa-heart" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <p>لا توجد قنوات مفضلة</p>
+                </div>
+            `;
+        }
+
+        // Load related videos
+        function loadRelatedVideos(currentVideoId) {
+            relatedVideosGrid.innerHTML = "";
+            
+            // Filter out current video and get other videos
+            const relatedVideos = appData.highlights.filter(video => video.id !== currentVideoId);
+            
+            // Create related video items
+            relatedVideos.forEach((video, index) => {
+                const relatedVideoItem = document.createElement("div");
+                relatedVideoItem.className = "related-video-item";
+                
+                relatedVideoItem.innerHTML = `
+                    <img src="${video.image}" alt="${video.title}">
+                    <div class="related-video-info">
+                        <div class="related-video-title">${video.title}</div>
+                    </div>
+                `;
+                
+                relatedVideoItem.addEventListener("click", () => {
+                    showVideoPlayer(video);
+                });
+                
+                relatedVideosGrid.appendChild(relatedVideoItem);
+            });
+        }
+
+        // Search function
+        function performSearch(query) {
+            // Get all channels
+            let allChannels = [];
+            
+            // Combine all channels from all categories
+            for (const category in appData.channels) {
+                allChannels = [...allChannels, ...appData.channels[category]];
+            }
+            
+            // Filter channels by query if provided
+            const filteredChannels = query 
+                ? allChannels.filter(channel => 
+                    channel.name.toLowerCase().includes(query.toLowerCase())
+                  )
+                : allChannels;
+            
+            // Display search results
+            searchResults.innerHTML = "";
+            
+            if (filteredChannels.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="search-no-results">
+                        لا توجد نتائج للبحث
+                    </div>
+                `;
+            } else {
+                filteredChannels.forEach(channel => {
+                    const resultItem = document.createElement("div");
+                    resultItem.className = "search-result-item";
+                    
+                    resultItem.innerHTML = `
+                        <img src="${channel.logo}" alt="${channel.name}" class="search-result-logo">
+                        <div class="search-result-name">${channel.name}</div>
+                    `;
+                    
+                    resultItem.addEventListener("click", () => {
+                        // Hide search results
+                        searchResults.classList.remove("active");
+                        searchInput.value = "";
+                        searchContainer.classList.remove('active');
+                        
+                        // Open channel URL in a new tab
+                        window.location.href = channel.url;
+                    });
+                    
+                    searchResults.appendChild(resultItem);
+                });
+            }
+            
+            searchResults.classList.add("active");
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            document.body.classList.toggle("light-mode");
+            
+            // Save theme preference
+            const isDarkMode = !document.body.classList.contains("light-mode");
+            localStorage.setItem("sportStreamDarkMode", isDarkMode ? "true" : "false");
+            
+            // Sync theme toggles
+            themeToggleCheckbox.checked = isDarkMode;
+            settingsThemeToggle.checked = isDarkMode;
+        }
+
+        // Load theme preference
+        function loadThemePreference() {
+            const isDarkMode = localStorage.getItem("sportStreamDarkMode") !== "false"; // Default to dark mode
+            
+            if (!isDarkMode) {
+                document.body.classList.add("light-mode");
+                themeToggleCheckbox.checked = false;
+                settingsThemeToggle.checked = false;
+            }
+        }
+
+        // Save settings
+        function saveSettings() {
+            localStorage.setItem("sportStreamSettings", JSON.stringify(appData.settings));
+        }
+
+        // Load settings
+        function loadSettings() {
+            const storedSettings = localStorage.getItem("sportStreamSettings");
+            if (storedSettings) {
+                appData.settings = JSON.parse(storedSettings);
+            }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem("sportStreamLoggedIn");
+            hideAllPages();
+            loginPage.classList.remove("hidden");
+        }
+
+        // Handle back button
+        function handleBackButton() {
+            if (appData.navigationHistory.length > 0) {
+                const previousPage = appData.navigationHistory.pop();
+                
+                if (previousPage === "main") {
+                    showMainApp();
+                } else if (previousPage === "highlights") {
+                    showHighlightsPage();
+                } else if (previousPage === "settings") {
+                    showSettingsPage();
+                } else if (previousPage === "favorites") {
+                    showFavoritesPage();
+                }
+            } else {
+                // If no history, go to main app
+                showMainApp();
+            }
+        }
+
+        // Handle browser back button
+        window.addEventListener('popstate', function(event) {
+            event.preventDefault();
+            handleBackButton();
+            return false;
+        });
+
+        // Event Listeners
+        document.addEventListener("DOMContentLoaded", () => {
+            // Load settings
+            loadSettings();
+            
+            // Check login status
+            checkLoginStatus();
+            
+            // Load theme preference
+            loadThemePreference();
+            
+            // Login button
+            loginBtn.addEventListener("click", login);
+            
+            // PIN input auto-focus next
+            pinDigits.forEach((digit, index) => {
+                digit.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1) {
+                        if (index < pinDigits.length - 1) {
+                            pinDigits[index + 1].focus();
+                        } else {
+                            // Last digit entered, verify PIN
+                            verifyPin();
+                        }
+                    }
+                });
+                
+                digit.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+                        pinDigits[index - 1].focus();
+                    }
+                });
+            });
+            
+            // PIN modal buttons
+            pinSubmit.addEventListener('click', verifyPin);
+            pinCancel.addEventListener('click', () => {
+                window.location.href = "http://action_exit";
+            });
+            
+            // Forgot PIN link
+            forgotPin.addEventListener('click', () => {
+                hidePinModal();
+                showCaptchaModal();
+            });
+            
+            // Set PIN modal buttons
+            setPinSave.addEventListener('click', setPin);
+            setPinCancel.addEventListener('click', () => {
+                hideSetPinModal();
+                appLockToggle.checked = appData.settings.appLock;
+            });
+            
+            // Change PIN modal buttons
+            changePinSave.addEventListener('click', changePin);
+            changePinCancel.addEventListener('click', hideChangePinModal);
+            
+            // CAPTCHA modal buttons
+            captchaVerify.addEventListener('click', verifyCaptcha);
+            captchaCancel.addEventListener('click', hideCaptchaModal);
+            captchaRefresh.addEventListener('click', generateCaptcha);
+            
+            // Side menu - Fix for side menu button
+            menuBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleSideMenu();
+            });
+            
+            closeMenuBtn.addEventListener("click", toggleSideMenu);
+            overlay.addEventListener("click", () => {
+                sideMenu.classList.remove("open");
+                overlay.classList.remove("active");
+                searchContainer.classList.remove('active');
+                searchResults.classList.remove('active');
+            });
+            
+            // Search toggle
+            mainSearchBtn.addEventListener("click", toggleSearchBar);
+            categorySearchBtn.addEventListener("click", toggleSearchBar);
+            allChannelsSearchBtn.addEventListener("click", toggleSearchBar);
+            highlightsSearchBtn.addEventListener("click", toggleSearchBar);
+            if (favoritesSearchBtn) favoritesSearchBtn.addEventListener("click", toggleSearchBar);
+            searchCloseBtn.addEventListener("click", toggleSearchBar);
+            
+            // Settings and About
+            settingsLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                toggleSideMenu();
+                showSettingsPage();
+            });
+            
+            aboutLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                toggleSideMenu();
+                showAboutPage();
+            });
+            
+            // Share app button
+            shareAppBtn.addEventListener("click", () => {
+                window.location.href = "http://action_share";
+            });
+            
+            // Go to account from About page
+            goToAccount.addEventListener("click", () => {
+                window.location.href = "https://t.me/IIIlIIv";
+            });
+            
+            // Theme toggles
+            themeToggleCheckbox.addEventListener("change", toggleTheme);
+            settingsThemeToggle.addEventListener("change", toggleTheme);
+            
+            // Settings toggles
+            setAppLock.addEventListener('click', toggleAppLock);
+            dataProtectionToggle.addEventListener('change', toggleDataProtection);
+            clearHistory.addEventListener('click', clearHistoryData);
+            clearCache.addEventListener('click', clearCacheData);
+            changePinItem.addEventListener('click', () => {
+                if (appData.settings.appLock && appData.settings.pin) {
+                    showChangePinModal();
+                } else {
+                    showToast("يجب تفعيل قفل التطبيق أولاً");
+                }
+            });
+            
+            // Back buttons - Fix for back button in channels menu
+            backToMainBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                handleBackButton();
+            });
+            
+            backFromAllChannelsBtn.addEventListener("click", handleBackButton);
+            backFromVideoBtn.addEventListener("click", handleBackButton);
+            backFromSettingsBtn.addEventListener("click", handleBackButton);
+            backFromAboutBtn.addEventListener("click", showMainApp); // Changed to go directly to main app
+            backToHighlightsBtn && backToHighlightsBtn.addEventListener("click", handleBackButton);
+            
+            // All channels button
+            allChannelsBtn.addEventListener("click", showAllChannels);
+            
+            // Logout
+            logoutBtn.addEventListener("click", logout);
+            logoutLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                toggleSideMenu();
+                logout();
+            });
+            
+            // Search input
+            searchInput.addEventListener("input", (e) => {
+                performSearch(e.target.value);
+                    });
+        
+        // Initialize the app
+        window.addEventListener('load', function() {
+            // Apply any stored theme
+            loadThemePreference();
+            
+            // Check if notification should be shown
+            const notificationClosed = localStorage.getItem("notificationClosed");
+            if (notificationClosed === "true") {
+                document.querySelector(".notification-bar").style.display = "none";
+            }
+            
+            // Close notification
+            closeNotification.addEventListener("click", function() {
+                document.querySelector(".notification-bar").style.display = "none";
+                localStorage.setItem("notificationClosed", "true");
+            });
+            
+            // Handle refresh buttons
+            refreshBtns.forEach(btn => {
+                btn.addEventListener("click", function() {
+                    showToast("تم تحديث المحتوى");
+                    showLoader().then(() => {
+                        // Refresh current page content
+                        if (mainApp.classList.contains("hidden") === false) {
+                            loadCategories();
+                        } else if (channelGrid.classList.contains("hidden") === false) {
+                            const category = categoryTitle.textContent;
+                            const categoryId = appData.categories.find(cat => cat.name === category)?.id || "bein-sd";
+                            loadChannels(categoryId);
+                        } else if (allChannelsPage.classList.contains("hidden") === false) {
+                            loadAllChannels();
+                        } else if (highlightsPage.classList.contains("hidden") === false) {
+                            loadHighlights();
+                        } else if (favoritesPage.classList.contains("hidden") === false) {
+                            loadFavorites();
+                        }
+                    });
+                });
+            });
+        });
+    });
+</script>
+</body>
+</html>
